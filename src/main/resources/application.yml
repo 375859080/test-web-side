@@ -3,7 +3,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
    # url: jdbc:mysql://10.82.82.161:3306/database?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
     url: jdbc:mysql://localhost:3306/database?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
-    initialize: true
     #schema: classpath:schema.sql #初始化数据表
     username: root
     password: 123456
@@ -16,3 +15,16 @@ spring:
       #validate 验证类中的属性是否与表结构一致，不一致 会报错
       ddl-auto: update
     show-sql: true
+# OSS相关配置信息
+aliyun:
+  oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com # oss对外服务的访问域名
+    accessKeyId: LTAI4FxCGTndo9z3uApTJQHJ # 访问身份验证中用到用户标识
+    accessKeySecret: YZpvNVYxfS9GkF0IV7OpE3HoOSL7Mr # 用户用于加密签名字符串和oss用来验证签名字符串的密钥
+    bucketName: 375859080 # oss的存储空间
+    policy:
+      expire: 300 # 签名有效期(S)
+    maxSize: 10 # 上传文件大小(M)
+    callback: http://172.16.83.228:8080/aliyun/oss/callback # 文件上传成功后的回调地址
+    dir:
+      prefix: mall/images/ # 上传文件夹路径前缀
