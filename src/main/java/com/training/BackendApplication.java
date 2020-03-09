@@ -6,6 +6,7 @@ import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletRequest;
 
 @SpringBootApplication
 public class BackendApplication {

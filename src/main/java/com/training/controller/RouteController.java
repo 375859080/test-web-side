@@ -102,9 +102,10 @@ public class RouteController {
     @ApiOperation("申请用车")
     @PostMapping("/applyCar")
     public ResponseResult applyCar(@RequestBody ApplyCarDTO applyCarDTO, HttpServletRequest request) {
-        HttpSession session=request.getSession();
-        User user= (User) session.getAttribute("user");
-        Long id=user.getId();
+//        HttpSession session=request.getSession();
+//        User user= (User) session.getAttribute("user");
+//        Long id=user.getId();
+        Long id=1L;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Route route = new Route(applyCarDTO.getStartTime(),applyCarDTO.getEndTime(),applyCarDTO.getCarId(),id,0,applyCarDTO.getReason(),0,df.format(new Date()));
         ResponseResult r = routeService.saveRoute(route);

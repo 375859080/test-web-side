@@ -1,13 +1,17 @@
 package com.training.service.Impl;
 
 import com.training.Util.TimeToStringUtil;
+import com.training.component.RouteTimeOutCancelTask;
 import com.training.domain.*;
 import com.training.model.*;
 import com.training.repository.*;
 import com.training.response.ResponseResult;
 import com.training.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +41,7 @@ public class RouteServiceImpl implements RouteService {
     SecRouteService secRouteService;
     @Autowired
     MasterService masterService;
-
+    private Logger logger = LoggerFactory.getLogger(RouteServiceImpl.class);
     @Override
     public ResponseResult findAllRoute() {
         List<Route> Routes = routeRepository.findAll();
@@ -113,6 +117,7 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Transactional
     public ResponseResult updateStatusOfRouteById(Long id, int st) {
         try {
             Route r = routeRepository.findById(id).get();
@@ -279,5 +284,24 @@ public class RouteServiceImpl implements RouteService {
             routes.get(i).setReimburseTime(TimeToStringUtil.getCurrentTime());
         }
         return new ResponseResult(routeRepository.saveAll(routes));
+    }
+
+    @Override
+    public void cancelTimeOutRoute(){
+        List<Route> routes = routeRepository.findRoutesByStatus(1);
+        for (Route route : routes){
+            try{
+                String startTime = route.getApplyStartTime();
+                Date startDate = TimeToStringUtil.getTimeFromString(startTime);
+                Long timeOutDate = startDate.getTime()+30*60*1000;
+                if (System.currentTimeMillis()>timeOutDate){
+                    route.setStatus(4);
+                    routeRepository.save(route);
+                    logger.info("取消超时行程"+route.getId());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }

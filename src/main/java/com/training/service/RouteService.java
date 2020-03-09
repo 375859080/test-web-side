@@ -47,4 +47,6 @@ public interface RouteService {
     ResponseResult findRoutesByUserId(Long userId);
     //批量修改route的isReimburse字段，改变审核状态
     ResponseResult updateRoutesIsReimburseByIds(List<Long>ids,int status);
+    //自动取消超时行程
+    void cancelTimeOutRoute();
 }

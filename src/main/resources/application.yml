@@ -1,4 +1,8 @@
 spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
    # url: jdbc:mysql://10.82.82.161:3306/database?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
@@ -15,6 +19,26 @@ spring:
       #validate 验证类中的属性是否与表结构一致，不一致 会报错
       ddl-auto: update
     show-sql: true
+  redis:
+    host: localhost # Redis服务器地址
+    database: 0 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: # Redis服务器连接密码（默认为空）
+    jedis:
+      pool:
+        max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1ms # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 8 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 3000ms # 连接超时时间（毫秒）
+  rabbitmq:
+    host: localhost # rabbitmq的连接地址
+    port: 5672 # rabbitmq的连接端口号
+    virtual-host: /route # rabbitmq的虚拟host
+    username: root # rabbitmq的用户名
+    password: 123456 # rabbitmq的密码
+    publisher-confirms: true #如果对异步消息需要回调必须设置为true
+
 # OSS相关配置信息
 aliyun:
   oss:
@@ -25,6 +49,6 @@ aliyun:
     policy:
       expire: 300 # 签名有效期(S)
     maxSize: 10 # 上传文件大小(M)
-    callback: http://172.16.83.228:8080/aliyun/oss/callback # 文件上传成功后的回调地址
+    callback: http://120.26.38.238:8080/aliyun/oss/callback # 文件上传成功后的回调地址
     dir:
-      prefix: mall/images/ # 上传文件夹路径前缀
+      prefix: privatecar/images/ # 上传文件夹路径前缀

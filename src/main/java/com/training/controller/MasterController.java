@@ -3,21 +3,28 @@ package com.training.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.prism.impl.ps.BaseShaderContext;
+import com.training.Util.TimeToStringUtil;
+import com.training.component.CancelRouteSender;
 import com.training.domain.Master;
+import com.training.domain.Route;
 import com.training.domain.User;
 import com.training.dto.AuditUserDTO;
 import com.training.dto.DeleteMasterDTO;
+import com.training.repository.RouteRepository;
 import com.training.response.ResponseResult;
 import com.training.service.CarService;
 import com.training.service.MasterService;
 import com.training.service.RouteService;
 import com.training.service.UserService;
 import io.swagger.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 
 
@@ -33,6 +40,12 @@ public class MasterController {
     MasterService masterService;
     @Autowired
     UserService userService;
+    @Autowired
+    CancelRouteSender cancelRouteSender;
+    @Autowired
+    RouteRepository routeRepository;
+
+    private static Logger logger = LoggerFactory.getLogger(MasterController.class);
 
     @ApiResponses({
             @ApiResponse(code = 200, message = "ok"),
@@ -44,8 +57,6 @@ public class MasterController {
             @ApiResponse(code = 505, message = "更新失败"),
             @ApiResponse(code = 506, message = "密码错误")
     })
-
-
     @ApiOperation("查询所有管理员的接口")
     @GetMapping("/")
     public ResponseResult findAllMasters() {
@@ -109,6 +120,24 @@ public class MasterController {
     public ResponseResult reviewUseCar(@RequestBody String body) {
         JSONObject json = JSON.parseObject(body);
         return routeService.updateStatusOfRouteById(json.getLong("routeId"), json.getInteger("status"));
+    }
+
+    //test by hjc
+    @ApiOperation("管理员审核行程申请")
+    @PostMapping("/reviewApplyRoute")
+    public ResponseResult reviewApplyRoute(Long routeID) {
+        routeService.updateStatusOfRouteById(routeID,1);
+        logger.info("行程id{}申请通过",routeID);
+        try{
+            Route route = routeRepository.findRouteById(routeID);
+            String startTime = route.getApplyStartTime();
+            Date startDate = TimeToStringUtil.getTimeFromString(startTime);
+            Long timeOutDate = startDate.getTime()+1*60*1000;
+            cancelRouteSender.sendMessage(routeID,timeOutDate-System.currentTimeMillis());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseResult(null);
     }
 
     @ApiOperation("管理员获取需要审核的相关信息")

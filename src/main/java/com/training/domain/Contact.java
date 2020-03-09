@@ -17,6 +17,9 @@ public class Contact {
     //电话
     private String phone;
 
+    public Contact() {
+    }
+
     public Contact(Long companyId, String name, String phone) {
         this.companyId = companyId;
         this.name = name;

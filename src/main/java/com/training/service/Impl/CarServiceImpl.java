@@ -13,6 +13,10 @@ import com.training.service.MasterService;
 import com.training.service.MessageService;
 import com.training.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import java.util.List;
  * by Huang
  */
 @Service
+@CacheConfig(cacheNames="car")
 public class CarServiceImpl implements CarService {
     @Autowired
     CarRepository carRepository;
@@ -41,6 +46,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Cacheable(key="'car'+ #p0")
     public ResponseResult getCarById(Long id) {
         try {
             Car car = carRepository.findById(id).get();
@@ -52,6 +58,8 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @CachePut(key="'car'+ #result.data.id")
+    @CacheEvict(key="'car-all'")
     public ResponseResult save(Car car){
         try {
             Car c = carRepository.save(car);
@@ -63,6 +71,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @CachePut(key="'car'+ #result.data.id")
     public ResponseResult update(Car car) {
         try {
             Car c = carRepository.save(car);
@@ -74,6 +83,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @CacheEvict(key="'car'+ #p0")
     public ResponseResult delete(Long id){
         try {
             carRepository.deleteById(id);
@@ -168,6 +178,7 @@ public class CarServiceImpl implements CarService {
 
     //获取所有车辆 by pja
     @Override
+    @Cacheable(key="'car-all'")
     public ResponseResult findAllCars(){
         return new ResponseResult(carRepository.findAll());
     }

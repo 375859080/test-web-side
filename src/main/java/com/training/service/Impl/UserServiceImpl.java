@@ -6,27 +6,35 @@ import com.training.repository.UserRepository;
 import com.training.response.ResponseResult;
 import com.training.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@CacheConfig(cacheNames="user")
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
     @Override
+    @Cacheable(key="user-all")
     public ResponseResult getUsers(){
         return new ResponseResult(userRepository.findAll());
     }
 
     @Override
+    @Cacheable(key="'user'+ #p0")
     public ResponseResult getUserById(Long id) {
         return new ResponseResult(userRepository.findById(id).get());
     }
 
     @Override
+    @CachePut(key="'user'+ #p0.id")
     public ResponseResult save(User user){
         return new ResponseResult(userRepository.save(user));
     }
@@ -48,6 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(key="'car'+ #p0")
     public ResponseResult delete(Long id){
         User user = userRepository.findById(id).get();
         userRepository.deleteById(id);
